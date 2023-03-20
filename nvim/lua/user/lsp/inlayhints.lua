@@ -10,7 +10,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     local client = vim.lsp.get_client_by_id(args.data.client_id)
     if client.name == 'tsserver' then
       require('lsp-inlayhints.adapter').set_old_tsserver()
-      vim.notify('set set_old_tsserver')
     end
     require('lsp-inlayhints').on_attach(client, bufnr)
   end,

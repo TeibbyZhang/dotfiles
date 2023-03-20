@@ -44,7 +44,8 @@ local plugin_list = {
   -- 'rcarriga/nvim-dap-ui',
 
 
-  'arcticicestudio/nord-vim', -- theme schema of my nvim
+  -- theme
+  'shaunsingh/nord.nvim',
 
   -- 'nvim-telescope/telescope-ui-select.nvim', -- I don't need it temporarily
 
@@ -146,6 +147,13 @@ local plugin_list = {
       'nvim-lua/plenary.nvim',
       'mfussenegger/nvim-dap',
     },
+    config = function()
+      require('rust-tools').setup({
+        inlay_hints = {
+          auto = false,
+        },
+      })
+    end,
   },
   {
     'glepnir/lspsaga.nvim',
@@ -177,12 +185,14 @@ local plugin_list = {
   },
   {
     'jayp0521/mason-null-ls.nvim',
+    event = { 'BufReadPre', 'BufNewFile' },
     requires = {
+      'nvim-lua/plenary.nvim',
       'williamboman/mason.nvim',
       'jose-elias-alvarez/null-ls.nvim',
     },
     config = function()
-      require('mason-null-ls').setup()
+      require('user.plugin_configs.null_ls')
     end,
   },
   {
@@ -206,12 +216,6 @@ local plugin_list = {
   },
 
   {
-    'alexaandru/nvim-lspupdate',
-    requires = {
-      'neovim/nvim-lspconfig',
-    },
-  },
-  {
     'lvimuser/lsp-inlayhints.nvim',
     -- branch = 'anticonceal',
     config = function()
@@ -220,11 +224,10 @@ local plugin_list = {
   },
   'b0o/schemastore.nvim',
   {
-    'junnplus/lsp-setup.nvim',
+    'williamboman/mason-lspconfig.nvim',
     requires = {
       'neovim/nvim-lspconfig',
       'williamboman/mason.nvim',
-      'williamboman/mason-lspconfig.nvim',
     },
     after = {
       'schemastore.nvim',
@@ -238,13 +241,6 @@ local plugin_list = {
     after = 'nvim-lspconfig',
     config = function()
       require('lsp_signature').setup()
-    end,
-  },
-  {
-    'jose-elias-alvarez/null-ls.nvim',
-    requires = { 'nvim-lua/plenary.nvim' },
-    config = function()
-      require('user.plugin_configs.null_ls')
     end,
   },
 
@@ -558,4 +554,3 @@ local plugin_list = {
 M.plugin_list = plugin_list
 
 return M
-

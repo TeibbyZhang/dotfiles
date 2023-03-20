@@ -1,12 +1,11 @@
+local _ = require('mason-core.functional')
 local gen_capabilities_with_snippet_support = require('user.lsp.utils').gen_capabilities_with_snippet_support
--- local lsp_installer = require('nvim-lsp-installer')
--- local servers = require('nvim-lsp-installer.servers')
 local on_attach = require('user.lsp.handler').on_attach
 
 -- local default_install_languages = {
 --   'bash',
 --   'css',
---   -- maybe donot need
+--   -- maybe do not need
 --   'eslint',
 --   'emmet',
 --   'graphql',
@@ -53,28 +52,28 @@ local default_language_server_config = {
 
   [server_name_language_map.typescript] = {
     settings = {
-      typescript = {
-        inlayHints = {
-          includeInlayParameterNameHints = 'all',
-          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-          includeInlayFunctionParameterTypeHints = true,
-          includeInlayVariableTypeHints = true,
-          includeInlayPropertyDeclarationTypeHints = true,
-          includeInlayFunctionLikeReturnTypeHints = true,
-          includeInlayEnumMemberValueHints = true,
-        }
-      },
-      javascript = {
-        inlayHints = {
-          includeInlayParameterNameHints = 'all',
-          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-          includeInlayFunctionParameterTypeHints = true,
-          includeInlayVariableTypeHints = true,
-          includeInlayPropertyDeclarationTypeHints = true,
-          includeInlayFunctionLikeReturnTypeHints = true,
-          includeInlayEnumMemberValueHints = true,
-        }
-      }
+      -- typescript = {
+      --   inlayHints = {
+      --     includeInlayParameterNameHints = 'all',
+      --     includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+      --     includeInlayFunctionParameterTypeHints = true,
+      --     includeInlayVariableTypeHints = true,
+      --     includeInlayPropertyDeclarationTypeHints = true,
+      --     includeInlayFunctionLikeReturnTypeHints = true,
+      --     includeInlayEnumMemberValueHints = true,
+      --   }
+      -- },
+      -- javascript = {
+      --   inlayHints = {
+      --     includeInlayParameterNameHints = 'all',
+      --     includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+      --     includeInlayFunctionParameterTypeHints = true,
+      --     includeInlayVariableTypeHints = true,
+      --     includeInlayPropertyDeclarationTypeHints = true,
+      --     includeInlayFunctionLikeReturnTypeHints = true,
+      --     includeInlayEnumMemberValueHints = true,
+      --   }
+      -- }
     }
   },
 
@@ -94,13 +93,7 @@ local default_language_server_config = {
 
   -- [server_name_language_map.graphql] = {},
 
-  [server_name_language_map.rust] = require('lsp-setup.rust-tools').setup({
-    tools = {
-      inlay_hints = {
-        auto = false,
-      },
-    },
-  }),
+  [server_name_language_map.rust] = {},
 }
 
 local ensure_installed_lsp = {
@@ -120,7 +113,7 @@ local ensure_installed_lsp = {
   server_name_language_map.yaml,
 }
 
-local opts = {
+local options = {
   installer = {
     ensure_installed = ensure_installed_lsp,
     automatic_installation = false,
@@ -130,32 +123,64 @@ local opts = {
     },
   },
   default_mappings = false,
-  mappings = {
-    -- gD = 'lua vim.lsp.buf.declaration()',
-    -- gd = 'lua vim.lsp.buf.definition()',
-    -- gi = 'lua vim.lsp.buf.implementation()',
-    -- gr = 'lua vim.lsp.buf.references()',
-    -- ['<Leader>wa'] = 'lua vim.lsp.buf.add_workspace_folder()',
-    -- ['<Leader>wr'] = 'lua vim.lsp.buf.remove_workspace_folder()',
-    -- ['<Leader>do'] = 'lua vim.diagnostic.open_float()',
-    -- ['<Leader>wl'] = 'lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))',
-    -- ['<Leader>cf'] = 'lua vim.lsp.buf.formatting()',
-    -- gp = 'lua require"lspsaga.provider".preview_definition()',
-    -- K = 'lua require("lspsaga.hover").render_hover_doc()',
-    -- ['<C-f>'] = 'lua require("lspsaga.action").smart_scroll_with_saga(1)',
-    -- ['<C-b>'] = 'lua require("lspsaga.action").smart_scroll_with_saga(-1)',
-    -- gs = 'lua require("lspsaga.signaturehelp").signature_help()',
-    -- ['<Leader>rn'] = 'lua require("lspsaga.rename").rename()',
-    -- ['<Leader>ca'] = 'lua require("lspsaga.codeaction").code_action()',
-    -- ['<Leader>dl'] = 'lua require"lspsaga.diagnostic".show_line_diagnostics()',
-    -- ['<Leader>dc'] = 'lua require"lspsaga.diagnostic".show_cursor_diagnostics()',
-    -- ['[d'] = 'lua require"lspsaga.diagnostic".lsp_jump_diagnostic_prev()',
-    -- [']d'] = 'lua require"lspsaga.diagnostic".lsp_jump_diagnostic_next()',
-  },
+  mappings = {},
   on_attach = on_attach,
   capabilities = require('cmp_nvim_lsp').default_capabilities(),
   servers = default_language_server_config,
 }
 
-require('lsp-setup').setup(opts)
+local function lsp_servers(opts)
+  local servers = {}
 
+  for server, config in pairs(default_language_server_config) do
+    local server_name = require('mason-core.package').Parse(server)
+
+    config = vim.tbl_deep_extend('keep', config, {
+      on_attach = opts.on_attach,
+      capabilities = opts.capabilities,
+      settings = {},
+    })
+
+    local capabilities = config.capabilities
+    local ok, cmp = pcall(require, 'cmp_nvim_lsp')
+    if ok then
+      config.capabilities = cmp.default_capabilities(capabilities)
+    end
+
+    local on_attach = config.on_attach
+    config.on_attach = function(client, bufnr)
+      on_attach(client, bufnr)
+      -- copilot 自动补出来的，暂时用不上
+      -- if client.resolved_capabilities.document_formatting then
+      --   vim.api.nvim_exec([[
+      --     augroup Format
+      --       autocmd! * <buffer>
+      --       autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
+      --     augroup END
+      --   ]], false)
+      -- end
+    end
+
+    servers[server_name] = config
+  end
+
+  return servers
+end
+
+local servers = lsp_servers(options)
+if vim.api.nvim_get_commands({})['Mason'] == nil then
+  require('mason').setup()
+end
+require('mason-lspconfig').setup({
+  ensure_installed = _.keys(options.servers),
+})
+require('mason-lspconfig').setup_handlers({
+  function(server_name)
+    local config = servers[server_name] or {}
+    -- local ok, coq = pcall(require, 'coq')
+    -- if ok then
+    --   config = coq.lsp_ensure_capabilities(config)
+    -- end
+    require('lspconfig')[server_name].setup(config)
+  end
+})
