@@ -1,4 +1,3 @@
-local vim = vim
 local set_options = require('common').set_options
 
 set_options({
@@ -7,6 +6,11 @@ set_options({
   showmatch = true,
   showcmd = true,
   showtabline = 2,
+  conceallevel = 3, -- Hide * markup for bold and italic
+  confirm = true, -- Confirm to save changes before exiting modified buffer
+  list = true, -- Show some invisible characters (tabs...
+  pumheight = 10, -- Maximum number of entries in a popup
+  sessionoptions = { "buffers", "curdir", "tabpages", "winsize" },
   magic = true,
   cmdheight = 2,
   completeopt = 'menuone,noselect',
@@ -26,7 +30,7 @@ set_options({
   tabstop = 2,
   softtabstop = 2,
   shiftwidth = 2,
-  backspace = 2,
+  backspace = 'indent,eol,start',
   cursorline = true,
 
   ruler = true,
@@ -35,6 +39,7 @@ set_options({
   smartcase = true,
   -- autoindent = true,
   -- smartindent = true,
+  shiftround = true, -- Round indent
   swapfile = false,
   timeoutlen = 200,
   undofile = true,
@@ -52,17 +57,26 @@ set_options({
   -- show terminal color
   termguicolors = true,
   background = 'dark',
+
+  -- for nvim 0.9
+  splitkeep = 'screen',
 })
 
-vim.cmd('set shortmess+=c')
-vim.cmd([[au FocusGained * :checktime]])
+-- C = true is for nvim 0.9
+vim.opt.shortmess:append({ W = true, I = true, c = true, C = true })
 
 if vim.fn.has('gui_running') == 1 then
   vim.cmd('set t_Co=256')
 end
 
-vim.cmd('filetype on')
-vim.cmd('filetype indent on')
-vim.cmd('filetype plugin on')
-vim.cmd('filetype plugin indent on')
+-- Fix markdown indentation settings
+vim.g.markdown_recommended_style = 0
+
+vim.g.do_filetype_lua = true
+vim.g.did_load_filetypes = false
+
+-- vim.cmd('filetype on')
+-- vim.cmd('filetype indent on')
+-- vim.cmd('filetype plugin on')
+-- vim.cmd('filetype plugin indent on')
 

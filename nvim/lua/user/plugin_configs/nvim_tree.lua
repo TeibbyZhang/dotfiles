@@ -1,4 +1,4 @@
-local set_keymap = require('common').set_keymap
+-- local set_keymap = require('common').set_keymap
 
 local config = {
   allow_resize = 1,
@@ -94,7 +94,7 @@ end
 local function open_nvim_tree(data)
 
   -- buffer is a [No Name]
-  local no_name = data.file == "" and vim.bo[data.buf].buftype == ""
+  local no_name = data.file == '' and vim.bo[data.buf].buftype == ''
 
   -- buffer is a directory
   local directory = vim.fn.isdirectory(data.file) == 1
@@ -109,15 +109,15 @@ local function open_nvim_tree(data)
   end
 
   -- open the tree
-  require("nvim-tree.api").tree.open()
+  require('nvim-tree.api').tree.open()
 end
 
 vim.api.nvim_create_autocmd({ 'VimEnter' }, { callback = open_nvim_tree })
 
--- key mapping for nvim tree
-set_keymap('n', '<C-n>', '<cmd>NvimTreeToggle<CR>', { noremap = true, silent = true })
-set_keymap('n', '<Leader>r', '<cmd>NvimTreeRefresh<CR>', { noremap = true, silent = true })
-set_keymap('n', '<Leader>n', '<cmd>NvimTreeFindFile<CR>', { noremap = true, silent = true })
+-- -- key mapping for nvim tree
+-- set_keymap('n', '<C-n>', '<cmd>NvimTreeToggle<CR>', { noremap = true, silent = true })
+-- set_keymap('n', '<Leader>r', '<cmd>NvimTreeRefresh<CR>', { noremap = true, silent = true })
+-- set_keymap('n', '<Leader>n', '<cmd>NvimTreeFindFile<CR>', { noremap = true, silent = true })
 
 require('nvim-tree').setup(setup_opts)
 

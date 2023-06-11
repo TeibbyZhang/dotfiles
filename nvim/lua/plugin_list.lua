@@ -1,41 +1,44 @@
 local M = {}
 
 local plugin_list = {
+  -- theme
   {
-    'lewis6991/impatient.nvim', -- speed up loading Lua modules
+    'shaunsingh/nord.nvim',
+    lazy = false,
+    priority = 1000,
     config = function()
-      require('impatient').enable_profile()
-      -- require('impatient')
+      require('user.colorscheme')
     end,
   },
-  'wbthomason/packer.nvim', -- use packer to manage itself
 
   -- base plugin
   {
     'kdheepak/lazygit.nvim',
+    event = 'VeryLazy',
     config = function()
       require('user.plugin_configs.lazygit')
     end,
   },
-  'nvim-lua/popup.nvim', -- implementation of the Popup API from vim in Neovim
-  'nvim-lua/plenary.nvim',
+
+  -- 'nvim-lua/popup.nvim', -- implementation of the Popup API from vim in Neovim
   {
     'rcarriga/nvim-notify', -- notify
+    lazy = false,
     config = function()
       vim.notify = require('notify')
     end,
   },
 
   -- copilot for neovim
-  {
-    "zbirenbaum/copilot.lua",
-    event = "VimEnter",
-    config = function()
-      vim.defer_fn(function()
-        require("copilot").setup()
-      end, 100)
-    end,
-  },
+  -- {
+  --   'zbirenbaum/copilot.lua',
+  --   event = 'VimEnter',
+  --   config = function()
+  --     vim.defer_fn(function()
+  --       require('copilot').setup()
+  --     end, 100)
+  --   end,
+  -- },
 
   -- debug 貌似不太好用，先注释掉
   -- -- for debugger
@@ -43,25 +46,18 @@ local plugin_list = {
   -- 'theHamsta/nvim-dap-virtual-text',
   -- 'rcarriga/nvim-dap-ui',
 
-
-  -- theme
-  'shaunsingh/nord.nvim',
-
   -- 'nvim-telescope/telescope-ui-select.nvim', -- I don't need it temporarily
 
   {
     'nvim-telescope/telescope.nvim', -- very nice plugin!
-    requires = {
+    dependencies = {
       'nvim-lua/plenary.nvim',
       {
         'nvim-telescope/telescope-fzf-native.nvim',
-        run = 'make',
+        build = 'make',
       },
       'nvim-telescope/telescope-live-grep-raw.nvim',
       'kdheepak/lazygit.nvim',
-    },
-    after = {
-      'project.nvim',
     },
     config = function()
       require('user.plugin_configs.telescope')
@@ -72,7 +68,7 @@ local plugin_list = {
   'MattesGroeger/vim-bookmarks',
   {
     'tom-anders/telescope-vim-bookmarks.nvim', -- use telescope prompt to show bookmarks
-    requires = {
+    dependencies = {
       'nvim-telescope/telescope.nvim',
     },
   },
@@ -80,7 +76,7 @@ local plugin_list = {
   -- dap use telescope ui
   {
     'nvim-telescope/telescope-dap.nvim',
-    requires = {
+    dependencies = {
       'nvim-telescope/telescope.nvim', -- very nice plugin!
       'mfussenegger/nvim-dap',
     },
@@ -89,42 +85,51 @@ local plugin_list = {
   -- treesitter
   {
     'nvim-treesitter/nvim-treesitter',
-    run = ':TSUpdate',
+    event = 'BufRead',
+    build = ':TSUpdate',
+    dependencies = {
+      'p00f/nvim-ts-rainbow',
+      'windwp/nvim-ts-autotag',
+      'nvim-treesitter/nvim-treesitter-textobjects',
+      'JoosepAlviste/nvim-ts-context-commentstring',
+      {
+        'romgrk/nvim-treesitter-context',
+        config = function()
+          require('user.plugin_configs.treesitter_context')
+        end,
+      },
+
+    },
     config = function()
       require('user.plugin_configs.treesitter')
     end,
   },
 
+  -- comment
   {
-    'p00f/nvim-ts-rainbow',
-    after = 'nvim-treesitter',
+    'terrortylor/nvim-comment',
+    event = 'BufRead',
+    config = function()
+      require('nvim_comment').setup({
+        hook = function()
+          require('ts_context_commentstring.internal').update_commentstring()
+        end,
+      })
+    end,
   },
-  {
-    'windwp/nvim-ts-autotag',
-    after = 'nvim-treesitter',
-  },
+
   {
     'andymass/vim-matchup',
     event = 'CursorMoved',
-    after = 'nvim-treesitter',
     config = function()
       vim.g.matchup_matchparen_offscreen = { method = 'popup' }
     end,
   },
-  {
-    'nvim-treesitter/nvim-treesitter-textobjects',
-    after = 'nvim-treesitter',
-  },
-  {
-    'romgrk/nvim-treesitter-context',
-    after = 'nvim-treesitter',
-    config = function()
-      require('user.plugin_configs.treesitter_context')
-    end,
-  },
+
   {
     'm-demare/hlargs.nvim', -- highlight function args
-    requires = {
+    event = 'BufRead',
+    dependencies = {
       'nvim-treesitter/nvim-treesitter',
     },
     config = function()
@@ -133,32 +138,34 @@ local plugin_list = {
     end,
   },
 
-  -- lsp auto install and autocomplete support for nvim
-  'neovim/nvim-lspconfig',
   {
     'folke/lsp-colors.nvim',
-    config = function()
-      require('lsp-colors').setup()
-    end,
+    event = 'LspAttach',
+    config = true,
   },
   {
     'simrat39/rust-tools.nvim',
-    requires = {
+    ft = { 'rust', 'toml' },
+    dependencies = {
       'nvim-lua/plenary.nvim',
       'mfussenegger/nvim-dap',
     },
     config = function()
       require('rust-tools').setup({
-        inlay_hints = {
-          auto = false,
+        tools = {
+          inlay_hints = {
+            auto = false,
+          },
         },
       })
     end,
   },
   {
     'glepnir/lspsaga.nvim',
-    requires = {
-      'neovim/nvim-lspconfig',
+    event = 'LspAttach',
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+      'nvim-treesitter/nvim-treesitter',
       -- need if config rust
       'simrat39/rust-tools.nvim',
     },
@@ -166,17 +173,18 @@ local plugin_list = {
       require('user.plugin_configs.lsp_saga')
     end
   },
+
   {
     'williamboman/mason.nvim',
-    config = function()
-      require('mason').setup({})
-    end,
+    event = 'UIEnter',
+    config = true,
   },
   
   -- mason extensions
   {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
-    requires = {
+    event = 'VeryLazy',
+    dependencies = {
       'williamboman/mason.nvim',
     },
     config = function()
@@ -186,7 +194,7 @@ local plugin_list = {
   {
     'jayp0521/mason-null-ls.nvim',
     event = { 'BufReadPre', 'BufNewFile' },
-    requires = {
+    dependencies = {
       'nvim-lua/plenary.nvim',
       'williamboman/mason.nvim',
       'jose-elias-alvarez/null-ls.nvim',
@@ -197,118 +205,110 @@ local plugin_list = {
   },
   {
     'RubixDev/mason-update-all',
-    requires = {
+    event = 'VeryLazy',
+    dependencies = {
       'williamboman/mason.nvim',
     },
-    config = function()
-      require('mason-update-all').setup()
-    end,
+    config = true,
   },
   {
     'jayp0521/mason-nvim-dap.nvim',
-    requires = {
+    event = 'VeryLazy',
+    dependencies = {
       'williamboman/mason.nvim',
       'mfussenegger/nvim-dap',
     },
-    config = function()
-      require('mason-nvim-dap').setup()
-    end,
+    config = true,
   },
 
   {
     'lvimuser/lsp-inlayhints.nvim',
-    -- branch = 'anticonceal',
+    event = 'BufReadPre',
+    branch = 'anticonceal',
     config = function()
       require('user.lsp.inlayhints')
     end,
   },
-  'b0o/schemastore.nvim',
   {
     'williamboman/mason-lspconfig.nvim',
-    requires = {
+    lazy = false,
+    dependencies = {
+      'b0o/schemastore.nvim',
       'neovim/nvim-lspconfig',
       'williamboman/mason.nvim',
-    },
-    after = {
-      'schemastore.nvim',
     },
     config = function()
       require('user.lsp')
     end,
   },
+
   {
     'ray-x/lsp_signature.nvim',
-    after = 'nvim-lspconfig',
+    event = 'InsertEnter',
     config = function()
       require('lsp_signature').setup()
     end,
   },
 
-  -- Snippet Plugins
-  'L3MON4D3/LuaSnip',
-  'rafamadriz/friendly-snippets',
   -- auto completion and snippet
   {
     'hrsh7th/nvim-cmp', -- Autocompletion plugin
-    requires = {
+    event = 'UIEnter',
+    dependencies = {
       'neovim/nvim-lspconfig',
-    },
-    after = {
-      'nvim-autopairs',
-      'LuaSnip',
+      -- Snippet Plugins
+      'L3MON4D3/LuaSnip',
+      'rafamadriz/friendly-snippets',
+
+      'hrsh7th/cmp-nvim-lsp', -- LSP source for nvim-cmp
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-path',
+      'hrsh7th/cmp-cmdline',
+      'saadparwaiz1/cmp_luasnip', -- Snippets source for nvim-cmp
+      'hrsh7th/cmp-calc',
+      'hrsh7th/cmp-emoji',
+      -- copilot cmp
+      {
+        'zbirenbaum/copilot-cmp',
+        config = function()
+          require('copilot_cmp').setup()
+        end
+      },
     },
     config = function()
       require('user.plugin_configs.nvim_cmp').setup()
     end,
   },
-  'hrsh7th/cmp-nvim-lsp', -- LSP source for nvim-cmp
-  'hrsh7th/cmp-buffer',
-  'hrsh7th/cmp-path',
-  'hrsh7th/cmp-cmdline',
-  'saadparwaiz1/cmp_luasnip', -- Snippets source for nvim-cmp
-  'hrsh7th/cmp-calc',
-  'hrsh7th/cmp-emoji',
-  
-  -- copilot cmp
-  {
-    "zbirenbaum/copilot-cmp",
-    after = { "copilot.lua" },
-    config = function ()
-      require("copilot_cmp").setup()
-    end
-  },
 
-  -- comment
-  {
-    'terrortylor/nvim-comment',
-    config = function()
-      require('nvim_comment').setup()
-    end,
-  },
   {
     'ethanholz/nvim-lastplace',
-    config = function()
-      require('nvim-lastplace').setup()
-    end,
+    lazy = false,
+    config = true,
   },
 
-  'tpope/vim-repeat',
+  -- 'tpope/vim-repeat',
   {
     'kylechui/nvim-surround',
-    config = function()
-      require('nvim-surround').setup()
-    end,
+    event = 'VeryLazy',
+    config = true,
   },
 
   {
     'akinsho/toggleterm.nvim', -- toggle terminal
-    config = function()
-      require('user.plugin_configs.toggleterm')
-    end,
+    event = 'BufRead',
+    keys = {
+      { '<Leader>tf', '<cmd>ToggleTerm direction=float<CR>', noremap = true, silent = true, desc = 'show float terminal' },
+      { '<Leader>th', '<cmd>ToggleTerm size=10 direction=horizontal<CR>', noremap = true, silent = true, desc = 'show horizontal terminal' },
+      { '<Leader>tv', '<cmd>ToggleTerm size=80 direction=vertical<CR>', noremap = true, silent = true, desc = 'show vertical terminal' },
+      { '<C-h>', '<C-\\><C-n><cmd>ToggleTermToggleAll<CR>', noremap = true, silent = true, mode = 't', desc = 'toggle terminal' },
+      { '<C-h>', '<cmd>ToggleTerm<CR>', noremap = true, silent = true, desc = 'toggle terminal' },
+    },
+    config = true,
   },
   -- indent blankline
   {
     'lukas-reineke/indent-blankline.nvim',
+    event = 'BufRead',
     config = function()
       require('indent_blankline').setup({
         show_current_context = true,
@@ -319,21 +319,24 @@ local plugin_list = {
   -- like eaymotion and more powerful
   {
     'phaazon/hop.nvim',
+    event = 'BufRead',
     config = function()
       require('user.plugin_configs.hop')
     end,
   },
 
-  {
-    'nathom/filetype.nvim',
-    config = function()
-      require('user.plugin_configs.filetype')
-    end,
-  },
+  -- {
+  --   'nathom/filetype.nvim',
+  --   lazy = false,
+  --   config = function()
+  --     require('user.plugin_configs.filetype')
+  --   end,
+  -- },
 
   -- autopairs
   {
     'windwp/nvim-autopairs',
+    event = 'InsertEnter',
     config = function()
       require('user.plugin_configs.autopairs')
     end,
@@ -342,7 +345,8 @@ local plugin_list = {
   -- git
   {
     'lewis6991/gitsigns.nvim',
-    requires = {
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
       'nvim-lua/plenary.nvim',
     },
     config = function()
@@ -351,12 +355,12 @@ local plugin_list = {
   },
   {
     'sindrets/diffview.nvim',
-    after = {
-      'project.nvim',
-    },
+    event = 'VeryLazy',
   },
+
   {
     'folke/trouble.nvim',
+    ft = { 'qf' },
     config = function()
       require('user.plugin_configs.trouble')
     end,
@@ -364,15 +368,16 @@ local plugin_list = {
 
   {
     'folke/which-key.nvim',
+    event = 'VeryLazy',
     config = function()
       require('user.plugin_configs/which_key')
     end,
   },
 
   {
-    'kyazdani42/nvim-web-devicons',
+    'nvim-tree/nvim-web-devicons',
     config = function()
-      require'nvim-web-devicons'.setup({
+      require('nvim-web-devicons').setup({
         override = {
           zsh = {
             icon = ' ',
@@ -389,83 +394,125 @@ local plugin_list = {
   {
     'ahmedkhalf/project.nvim',
     config = function()
-      require("project_nvim").setup({})
+      require('project_nvim').setup({})
     end,
   },
 
   -- tree plugin
   {
     'kyazdani42/nvim-tree.lua',
-    requires = {
-      'kyazdani42/nvim-web-devicons',
+    lazy = false,
+    keys = {
+      { '<C-n>', '<cmd>NvimTreeToggle<CR>', noremap = true, silent = true, desc = 'ToggleNvimTree' },
+      { '<Leader>r', '<cmd>NvimTreeRefresh<CR>', noremap = true, silent = true, desc = 'RefreshNvimTree' },
+      { '<Leader>n', '<cmd>NvimTreeFindFile<CR>', noremap = true, silent = true, desc = 'FindFileInNvimTree' },
     },
-    after = {
-      'project.nvim',
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
     },
     config = function()
       require('user.plugin_configs.nvim_tree')
     end,
   },
+  -- {
+  --   "nvim-neo-tree/neo-tree.nvim",
+  --   branch = "v2.x",
+  --   dependencies = {
+  --     "nvim-lua/plenary.nvim",
+  --     "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+  --     "MunifTanjim/nui.nvim",
+  --     {
+  --       -- only needed if you want to use the commands with "_with_window_picker" suffix
+  --       's1n7ax/nvim-window-picker',
+  --       tag = "v1.*",
+  --       config = function()
+  --         require('user.plugin_configs.window_picker')
+  --       end,
+  --     }
+  --   },
+  --   config = function ()
+  --     require('user.plugin_configs.neo_tree')
+  --   end
+  -- },
 
-  {
-    'SmiteshP/nvim-gps',
-    requires = {
-      'nvim-treesitter/nvim-treesitter',
-    },
-    config = function()
-      require('nvim-gps').setup()
-    end,
-  },
+  -- {
+  --   'SmiteshP/nvim-gps',
+  --   dependencies = {
+  --     'nvim-treesitter/nvim-treesitter',
+  --   },
+  --   config = function()
+  --     require('nvim-gps').setup()
+  --   end,
+  -- },
 
-  -- winbar
+  -- version 2.0 of nvim-gps, based on lsp
   {
-    'fgheng/winbar.nvim',
-    requires = {
-      'SmiteshP/nvim-gps',
-    },
-    after = {
-      'nvim-gps',
-    },
+    'SmiteshP/nvim-navic',
+    event = 'LspAttach',
+    dependencies = 'neovim/nvim-lspconfig',
     config = function()
-      require('winbar').setup({
-        enabled = true,
-        show_file_path = true,
-        show_symbols = true,
-      })
+      require('user.plugin_configs.nvim_navic')
     end,
   },
 
   {
     'j-hui/fidget.nvim',
+    event = 'BufRead',
+    tag = 'legacy',
     config = function()
       require('fidget').setup();
     end,
   },
 
-  -- 'arkav/lualine-lsp-progress',
   -- status bar
+  -- heirline.nvim also config winbar
+  -- {
+  --   'rebelot/heirline.nvim',
+  --   -- You can optionally lazy-load heirline on UiEnter
+  --   -- to make sure all required plugins and colorschemes are loaded before setup
+  --   event = "UiEnter",
+  --   config = function()
+  --     require('user.plugin_configs.heirline')
+  --   end
+  -- },
   {
     'nvim-lualine/lualine.nvim',
-    requires = {
-      'kyazdani42/nvim-web-devicons',
+    event = 'BufRead',
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
       opt = true,
-    },
-    after = {
-      'nvim-gps',
-      -- 'lualine-lsp-progress',
     },
     config = function()
       require('user.plugin_configs.lualine')
     end,
   },
   {
+    'Bekaboo/dropbar.nvim',
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+    },
+    opts = {
+      icons = {
+        ui = {
+          bar = {
+            separator = ' > ',
+          },
+        },
+      },
+    },
+  },
+
+  -- buf perf
+  {
     'akinsho/bufferline.nvim',
+    event = 'BufRead',
     config = function()
       require('user.plugin_configs.bufferline')
     end,
   },
   {
     'johann2357/nvim-smartbufs',
+    event = 'BufRead',
     config = function()
       require('user.plugin_configs.smartbufs')
     end,
@@ -483,48 +530,47 @@ local plugin_list = {
   -- others
   {
     'folke/todo-comments.nvim', -- enhance todo comments
-    requires = 'nvim-lua/plenary.nvim',
-    config = function()
-      require('todo-comments').setup()
-    end,
+    event = { "BufReadPost", "BufNewFile" },
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+    },
+    config = true,
   },
   -- show outline
   {
     'stevearc/aerial.nvim',
-    config = function()
-      require('aerial').setup()
-    end,
+    event = 'BufRead',
+    config = true,
   },
+
   -- show color of hex color
   {
     'norcalli/nvim-colorizer.lua',
+    event = 'BufRead',
     config = function()
       require('colorizer').setup()
     end
   },
 
-  'ldelossa/litee.nvim',
-  {
-    'ldelossa/litee-calltree.nvim',
-    requires = {
-      'ldelossa/litee.nvim',
-    },
-    config = function()
-      require('user.plugin_configs.litee_calltree')
-    end
-  },
-  'ellisonleao/glow.nvim', -- preview markdown
-  'mtdl9/vim-log-highlighting',
-  {
-    'Pocco81/HighStr.nvim',
-    config = function()
-      require('user.plugin_configs.high_str')
-    end
-  },
+  -- {
+  --   'ldelossa/litee-calltree.nvim',
+  --   event = 'BufRead',
+  --   dependencies = {
+  --     'ldelossa/litee.nvim',
+  --   },
+  --   config = function()
+  --     require('user.plugin_configs.litee_calltree')
+  --   end
+  -- },
 
-  -- editorconfig read
+  -- {
+  --   'ellisonleao/glow.nvim', -- preview markdown
+  --   config = true,
+  --   cmd = 'Glow',
+  -- },
   {
-    'gpanders/editorconfig.nvim',
+    'mtdl9/vim-log-highlighting',
+    event = 'VeryLazy',
   },
 
   -- quickfix enhanced
@@ -543,7 +589,7 @@ local plugin_list = {
   --   config = function()
   --     require('user.plugin_configs.noice')
   --   end,
-  --   requires = {
+  --   dependencies = {
   --     'MunifTanjim/nui.nvim',
   --     'rcarriga/nvim-notify',
   --     'hrsh7th/nvim-cmp',

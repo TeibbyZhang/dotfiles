@@ -1,45 +1,21 @@
-local fn = vim.fn
-local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
-local packer_bootstrap = false
-
-if fn.empty(fn.glob(install_path)) > 0 then
-  packer_bootstrap = fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    'git',
+    'clone',
+    '--filter=blob:none',
+    'https://github.com/folke/lazy.nvim.git',
+    '--branch=stable', -- latest stable release
+    lazypath,
+  })
 end
+vim.opt.rtp:prepend(lazypath)
 
-local packer = require('packer')
-local plugins = require('plugin_list').plugin_list
-
-local config = {
-  display = {
-    open_fn = function()
-      return require('packer.util').float({ border = 'rounded' })
-    end,
-  },
-  profile = {
-    enable = true,
-    threshold = 1,
+local plugin_list = require('plugin_list').plugin_list
+local opts = {
+  defaults = {
+    lazy = false,
   },
 }
 
-vim.cmd [[packadd packer.nvim]]
-
-vim.api.nvim_exec([[
-  augroup Packer
-    autocmd!
-    autocmd BufWritePost plugins.lua,plugin_list.lua source <afile> | PackerCompile
-  augroup end
-]], false)
-
-packer.reset()
-packer.init(config)
-
-return packer.startup({
-  function(use)
-    for _, plugin in ipairs(plugins) do
-      use(plugin)
-    end
-    if packer_bootstrap then
-      packer.sync()
-    end
-  end,
-})
+require('lazy').setup(plugin_list, opts)

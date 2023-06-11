@@ -19,7 +19,9 @@ function M.setup()
       entries = "custom",
     },
     experimental = {
-      ghost_text = true,
+      ghost_text = {
+        hl_group = 'Comment',
+      },
     },
     formatting = {
       fields = { 'abbr', 'kind', 'menu' },

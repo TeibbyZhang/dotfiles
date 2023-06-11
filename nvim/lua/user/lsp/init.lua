@@ -52,28 +52,28 @@ local default_language_server_config = {
 
   [server_name_language_map.typescript] = {
     settings = {
-      -- typescript = {
-      --   inlayHints = {
-      --     includeInlayParameterNameHints = 'all',
-      --     includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-      --     includeInlayFunctionParameterTypeHints = true,
-      --     includeInlayVariableTypeHints = true,
-      --     includeInlayPropertyDeclarationTypeHints = true,
-      --     includeInlayFunctionLikeReturnTypeHints = true,
-      --     includeInlayEnumMemberValueHints = true,
-      --   }
-      -- },
-      -- javascript = {
-      --   inlayHints = {
-      --     includeInlayParameterNameHints = 'all',
-      --     includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-      --     includeInlayFunctionParameterTypeHints = true,
-      --     includeInlayVariableTypeHints = true,
-      --     includeInlayPropertyDeclarationTypeHints = true,
-      --     includeInlayFunctionLikeReturnTypeHints = true,
-      --     includeInlayEnumMemberValueHints = true,
-      --   }
-      -- }
+      typescript = {
+        inlayHints = {
+          includeInlayParameterNameHints = 'all',
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayVariableTypeHints = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayEnumMemberValueHints = true,
+        }
+      },
+      javascript = {
+        inlayHints = {
+          includeInlayParameterNameHints = 'all',
+          includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          includeInlayFunctionParameterTypeHints = true,
+          includeInlayVariableTypeHints = true,
+          includeInlayPropertyDeclarationTypeHints = true,
+          includeInlayFunctionLikeReturnTypeHints = true,
+          includeInlayEnumMemberValueHints = true,
+        }
+      }
     }
   },
 
@@ -149,6 +149,7 @@ local function lsp_servers(opts)
 
     local on_attach = config.on_attach
     config.on_attach = function(client, bufnr)
+      require('nvim-navic').attach(client, bufnr)
       on_attach(client, bufnr)
       -- copilot 自动补出来的，暂时用不上
       -- if client.resolved_capabilities.document_formatting then

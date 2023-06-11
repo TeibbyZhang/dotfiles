@@ -8,20 +8,22 @@ set_common_keymap('n', '<C-j>', '15j')
 set_common_keymap('n', '<C-k>', '15k')
 set_common_keymap('v', '<C-j>', '15j')
 set_common_keymap('v', '<C-k>', '15k')
-set_common_keymap('n', 'j', 'gj')
-set_common_keymap('n', 'k', 'gk')
-set_common_keymap('n', 'gj', 'j')
-set_common_keymap('n', 'gk', 'k')
+set_keymap('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true, noremap = true, })
+set_keymap('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true, noremap = true, })
+-- set_common_keymap('n', 'gj', 'j')
+-- set_common_keymap('n', 'gk', 'k')
 
 -- enhanced nomal action
 set_common_keymap('n', 'n', 'nzz')
 set_common_keymap('n', 'N', 'Nzz')
-set_common_keymap('n', '<C-s>', ':w<CR>')
+set_common_keymap('n', '<C-s>', '<cmd>w<CR>')
 set_common_keymap('i', 'jj', '<Esc>')
 set_common_keymap('n', '<Leader><Leader>c', ':%s///gn<CR>')
 
 set_common_keymap('n', '&', ':&&<CR>')
 set_common_keymap('x', '&', ':&&<CR>')
+
+set_common_keymap('n', '<Leader>ui', vim.show_pos, { desc = 'Inspect Pos' })
 
 -- move enhanced
 set_common_keymap('i', '<A-j>', '<Esc>:m .+1<CR>==gi')
@@ -56,4 +58,3 @@ M.wk_leader_key_map = {
 vim.cmd [[autocmd FileType qf nnoremap <buffer> <CR> <CR>:cclose<CR>]]
 
 return M
-
