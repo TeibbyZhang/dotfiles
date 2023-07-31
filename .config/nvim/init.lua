@@ -7,4 +7,4 @@ require('autocmds')
 require('base_key_mapping')
 require('sign_define')
 
-require('plugins');
+require('plugins')

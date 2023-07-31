@@ -17,9 +17,9 @@ set_options({
   hidden = true,
   hlsearch = true,
   encoding = 'utf-8',
-  termencoding = 'utf-8',
-  fileencoding = 'utf-8',
-  fileencodings = 'utf-8',
+  -- termencoding = 'utf-8',
+  -- fileencoding = 'utf-8',
+  -- fileencodings = 'utf-8',
   helplang = 'cn',
   langmenu = 'en_US.UTF-8',
   -- -- allow buffer line clickable
@@ -67,6 +67,10 @@ vim.opt.shortmess:append({ W = true, I = true, c = true, C = true })
 
 if vim.fn.has('gui_running') == 1 then
   vim.cmd('set t_Co=256')
+end
+
+if vim.fn.has('linux') == 1 then
+  vim.g.fcitx5_rime = 1
 end
 
 -- Fix markdown indentation settings

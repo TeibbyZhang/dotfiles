@@ -23,7 +23,10 @@ set_common_keymap('n', '<Leader><Leader>c', ':%s///gn<CR>')
 set_common_keymap('n', '&', ':&&<CR>')
 set_common_keymap('x', '&', ':&&<CR>')
 
-set_common_keymap('n', '<Leader>ui', vim.show_pos, { desc = 'Inspect Pos' })
+set_keymap({ 'n', 'v' }, '<Leader>y', '"+y', { desc = 'Clipboard yank' })
+set_keymap({ 'n', 'v' }, '<Leader>p', '"+p', { desc = 'Clipboard paste' })
+
+set_keymap('n', '<Leader>ui', vim.show_pos, { desc = 'Inspect Pos' })
 
 -- move enhanced
 set_common_keymap('i', '<A-j>', '<Esc>:m .+1<CR>==gi')

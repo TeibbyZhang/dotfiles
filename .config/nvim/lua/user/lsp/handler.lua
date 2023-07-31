@@ -1,6 +1,6 @@
 local M = {}
 
-local function set_buf_config(bufnr)
+local function set_buf_config(bufnr, client)
   local set_keymap = require('common').set_keymap
   local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
@@ -39,6 +39,11 @@ local function set_buf_config(bufnr)
   set_keymap('n', '[E', function() require('lspsaga.diagnostic').goto_prev({ severity = vim.diagnostic.severity.ERROR }) end, opts)
   set_keymap('n', ']E', function() require('lspsaga.diagnostic').goto_next({ severity = vim.diagnostic.severity.ERROR }) end, opts)
   set_keymap('n', '<Leader>co', ':LSoutlineToggle<CR>', opts)
+
+  local ok, navic = pcall(require, 'nvim-navic')
+  if ok then
+    navic.attach(client, bufnr)
+  end
 end
 
 local function set_highlight_document(client)
@@ -58,7 +63,7 @@ local function set_highlight_document(client)
 end
 
 M.on_attach = function(client, bufnr)
-  set_buf_config(bufnr)
+  set_buf_config(bufnr, client)
   set_highlight_document(client)
 end
 

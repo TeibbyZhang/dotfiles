@@ -2,13 +2,28 @@ local M = {}
 
 local plugin_list = {
   -- theme
+  -- {
+  --   'shaunsingh/nord.nvim',
+  --   lazy = false,
+  --   priority = 1000,
+  --   config = function()
+  --     require('user.colorscheme')
+  --   end,
+  -- },
+
   {
-    'shaunsingh/nord.nvim',
-    lazy = false,
+    "catppuccin/nvim",
+    name = "catppuccin",
     priority = 1000,
     config = function()
       require('user.colorscheme')
     end,
+  },
+
+  -- inputt method for linux
+  {
+    'h-hg/fcitx.nvim',
+    cond = vim.fn.has('linux') == 1,
   },
 
   -- base plugin
@@ -25,7 +40,11 @@ local plugin_list = {
     'rcarriga/nvim-notify', -- notify
     lazy = false,
     config = function()
-      vim.notify = require('notify')
+      local notify = require('notify');
+      notify.setup({
+        background_colour = '#000000',
+      })
+      vim.notify = notify
     end,
   },
 
@@ -88,7 +107,6 @@ local plugin_list = {
     event = 'BufRead',
     build = ':TSUpdate',
     dependencies = {
-      'p00f/nvim-ts-rainbow',
       'windwp/nvim-ts-autotag',
       'nvim-treesitter/nvim-treesitter-textobjects',
       'JoosepAlviste/nvim-ts-context-commentstring',
@@ -102,6 +120,13 @@ local plugin_list = {
     },
     config = function()
       require('user.plugin_configs.treesitter')
+    end,
+  },
+  {
+    'HiPhish/rainbow-delimiters.nvim',
+    event = 'BufRead',
+    config = function()
+      require('user.plugin_configs.rainbow_delimiters')
     end,
   },
 
@@ -145,13 +170,18 @@ local plugin_list = {
   },
   {
     'simrat39/rust-tools.nvim',
-    ft = { 'rust', 'toml' },
+    -- use this will not auto attach server when enter rust buffer
+    -- ft = { 'rust', 'toml' },
+    event = { "BufReadPost *.rs,*.toml" },
     dependencies = {
       'nvim-lua/plenary.nvim',
       'mfussenegger/nvim-dap',
     },
     config = function()
       require('rust-tools').setup({
+        server = {
+          on_attach = require('user.lsp.handler').on_attach
+        },
         tools = {
           inlay_hints = {
             auto = false,
@@ -460,7 +490,11 @@ local plugin_list = {
     event = 'BufRead',
     tag = 'legacy',
     config = function()
-      require('fidget').setup();
+      require('fidget').setup({
+        window = {
+          blend = 0,
+        },
+      });
     end,
   },
 

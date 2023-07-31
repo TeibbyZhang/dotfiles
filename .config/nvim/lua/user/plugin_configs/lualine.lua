@@ -63,7 +63,7 @@ end
 
 local setup_opts = {
   options = {
-    theme = 'nord',
+    theme = 'catppuccin',
     always_divide_middle = false,
     disabled_filetypes = { 'alpha', 'dashboard', 'NvimTree', 'Outline' },
   },

@@ -1,20 +1,22 @@
 local langs = {
   'bash',
-  'css',
   'graphql',
   'html',
   'json',
   'json5',
   'jsonc',
-  'javascript',
   'lua',
   'rust',
-  'typescript',
+  'toml',
   'yaml',
+  'css',
+  'javascript',
+  'typescript',
   'tsx',
   'jsdoc',
   'markdown',
-  'toml',
+  -- use for lsp_saga hover action
+  'markdown_inline',
 }
 
 -- let tsconfig*.json can parse comment in json file
@@ -68,11 +70,6 @@ local config = {
   indent = {
     enable = true,
     disable = { 'yaml' },
-  },
-  rainbow = {
-    enable = true,
-    extended_mode = true,
-    max_file_lines = nil,
   },
   auto_tag = {
     enable = true,

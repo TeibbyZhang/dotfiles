@@ -147,21 +147,6 @@ local function lsp_servers(opts)
       config.capabilities = cmp.default_capabilities(capabilities)
     end
 
-    local on_attach = config.on_attach
-    config.on_attach = function(client, bufnr)
-      require('nvim-navic').attach(client, bufnr)
-      on_attach(client, bufnr)
-      -- copilot 自动补出来的，暂时用不上
-      -- if client.resolved_capabilities.document_formatting then
-      --   vim.api.nvim_exec([[
-      --     augroup Format
-      --       autocmd! * <buffer>
-      --       autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
-      --     augroup END
-      --   ]], false)
-      -- end
-    end
-
     servers[server_name] = config
   end
 
@@ -178,6 +163,9 @@ require('mason-lspconfig').setup({
 require('mason-lspconfig').setup_handlers({
   function(server_name)
     local config = servers[server_name] or {}
+    if server_name == server_name_language_map.rust then
+      return
+    end
     -- local ok, coq = pcall(require, 'coq')
     -- if ok then
     --   config = coq.lsp_ensure_capabilities(config)
