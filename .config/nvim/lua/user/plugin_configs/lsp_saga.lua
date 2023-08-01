@@ -1,8 +1,16 @@
 local lspsaga = require('lspsaga')
 lspsaga.setup({
-  border_style = 'rounded',
   symbol_in_winbar = {
     enable = false,
+  },
+  ui = {
+    border = 'rounded',
+    expand = '⊞',
+    collapse = '⊟',
+    code_action = '󰌵',
+    actionfix = ' ',
+    kind = nil,
+    imp_sign = '󰳛 ',
   },
 })
 vim.api.nvim_exec(

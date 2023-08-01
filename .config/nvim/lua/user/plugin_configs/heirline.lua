@@ -464,7 +464,7 @@ local DAPMessages = {
   end,
   hl = "Debug",
   {
-    provider = "",
+    provider = "󰆹",
     on_click = {
       callback = function()
         require("dap").step_into()
@@ -474,7 +474,7 @@ local DAPMessages = {
   },
   { provider = " " },
   {
-    provider = "",
+    provider = "󰆸",
     on_click = {
       callback = function()
         require("dap").step_out()
@@ -484,7 +484,7 @@ local DAPMessages = {
   },
   { provider = " " },
   {
-    provider = " ",
+    provider = "󰆷 ",
     on_click = {
       callback = function()
         require("dap").step_over()
@@ -494,7 +494,7 @@ local DAPMessages = {
   },
   { provider = " " },
   {
-    provider = "ﰇ",
+    provider = "󰜉",
     on_click = {
       callback = function()
         require("dap").run_last()
@@ -504,7 +504,7 @@ local DAPMessages = {
   },
   { provider = " " },
   {
-    provider = "",
+    provider = "󰅖",
     on_click = {
       callback = function()
         require("dap").terminate()
@@ -514,7 +514,7 @@ local DAPMessages = {
     },
   },
   { provider = " " },
-  -- icons:       ﰇ  
+  -- icons: 󰆹 󰆸 󰆷    󰜉 󰃤 
 }
 
 -- Note: check "j-hui/fidget.nvim" for a nice statusline-free alternative.
@@ -778,8 +778,8 @@ local HelpFileName = {
 --     return vim.tbl_contains({'s', 'i'}, vim.fn.mode())
 --   end,
 --   provider = function()
---     local forward = (vim.fn["UltiSnips#CanJumpForwards"]() == 1) and "" or ""
---     local backward = (vim.fn["UltiSnips#CanJumpBackwards"]() == 1) and " " or ""
+--     local forward = (vim.fn["UltiSnips#CanJumpForwards"]() == 1) and "󰁔" or ""
+--     local backward = (vim.fn["UltiSnips#CanJumpBackwards"]() == 1) and "󰁍 " or ""
 --     return backward .. forward
 --   end,
 --   hl = { fg = "red", bold = true },
