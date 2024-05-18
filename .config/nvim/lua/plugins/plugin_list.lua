@@ -39,12 +39,6 @@ return {
     end,
   },
   {
-    'ahmedkhalf/project.nvim',
-    opts = {
-      manual_mode = false,
-    },
-  },
-  {
     'm-demare/hlargs.nvim', -- highlight function args
     event = 'BufRead',
     dependencies = {

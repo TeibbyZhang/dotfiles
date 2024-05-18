@@ -1,10 +1,5 @@
 return {
   {
-    'mrcjkb/rustaceanvim',
-    version = '^4', -- Recommended
-    ft = { 'rust' },
-  },
-  {
     'neovim/nvim-lspconfig',
     opts = {
       servers = {
@@ -37,16 +32,6 @@ return {
           },
         },
       },
-      inlay_hints = {
-        enabled = true,
-      },
-    },
-    setup = {
-      rust_analyzer = function()
-        -- local rustaceanvim_opts = require("lazyvim.util").opts("rustaceanvim")
-        -- require("rustaceanvim").setup(vim.tbl_deep_extend("force", rustaceanvim_opts or {}, { server = opts }))
-        return true
-      end,
     },
   },
 }
