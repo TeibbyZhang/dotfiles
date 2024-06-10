@@ -19,3 +19,5 @@ map({ 'n', 'v' }, '<Leader>p', '"+p', { desc = 'Clipboard paste' })
 map('n', '<C-l>', ':<C-u>nohlsearch<CR><C-l>', { noremap = true, silent = true })
 map('t', '<C-l>', '<C-l>', { noremap = true })
 map('c', '%%', "getcmdtype()==':'?expand('%:h').'/':'%%'", { expr = true })
+
+map('n', '<C-p>', '<cmd>Telescope find_files<CR>')

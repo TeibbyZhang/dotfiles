@@ -10,6 +10,7 @@ vim.g.do_filetype_lua = true
 vim.g.did_load_filetypes = false
 
 local options = {
+  clipboard = '',
   encoding = 'utf-8',
   relativenumber= false,
   scrolloff = 8,

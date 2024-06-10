@@ -4,7 +4,6 @@ return {
     ft = { 'qf' },
     opts = {
       position = 'bottom',
-      icons = true,
       height = 10,
       mode = 'workspace_diagnostics',
       group = true,
